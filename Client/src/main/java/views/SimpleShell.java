@@ -6,21 +6,39 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.sun.xml.internal.bind.v2.model.core.ID;
 import controllers.IdController;
 import controllers.MessageController;
+import models.Id;
 
-// Simple Shell is a Console view for YouAreEll.
+// Simple Shell is a Console view for views.YouAreEll.
 public class SimpleShell {
 
 
-    public static void prettyPrint(String output) {
-        // yep, make an effort to format things nicely, eh?
+
+    public static void prettyPrint(String output) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        Object json = mapper.readValue(output, Object.class);
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+        output = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(json);
         System.out.println(output);
+
+//        IdTextView textView = new IdTextView();
+//        System.out.println(textView.printIds(IdController.getINSTANCE().getIdList()));
     }
+
+
     public static void main(String[] args) throws java.io.IOException {
 
-        YouAreEll webber = new YouAreEll(new MessageController(), new IdController());
+        ObjectMapper mapper = new ObjectMapper();
+
+        YouAreEll webber = new YouAreEll(MessageController.getINSTANCE(), IdController.getINSTANCE());
         
         String commandLine;
         BufferedReader console = new BufferedReader
@@ -66,11 +84,32 @@ public class SimpleShell {
                 // Specific Commands.
 
                 // ids
-                if (list.contains("ids")) {
+                if (list.contains("ids") && list.size() == 1) {
                     String results = webber.get_ids();
                     SimpleShell.prettyPrint(results);
                     continue;
                 }
+
+
+                if (list.contains("ids") && list.size() == 3){
+                    webber.get_ids();
+                    Id id = IdController.getINSTANCE().listContains(list.get(2));
+                    if (id == null){
+                        Id newId = new Id(list.get(1), list.get(2));
+                        String jsonID = mapper.writeValueAsString(newId);
+                        String results = webber.post_id(jsonID);
+                        SimpleShell.prettyPrint(results);
+                        continue;
+                    } else {
+                        id.setName(list.get(1));
+                        String jsonID = mapper.writeValueAsString(id);
+                        String results = webber.put_id(jsonID);
+                        SimpleShell.prettyPrint(results);
+                        continue;
+                    }
+                }
+
+
 
                 // messages
                 if (list.contains("messages")) {
