@@ -16,6 +16,9 @@ public class TransactionController {
     private String jpayload;
     private String responseString;
     private RequestBody requestBody;
+    private Response response;
+    private Call call;
+    private String formattedResponse;
     private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
 
@@ -26,60 +29,34 @@ public class TransactionController {
         this.mainurl = mainurl;
         this.method = method;
         this.jpayload = jpayload;
-        responseMaker();
+        this.requestBody = RequestBody.create(JSON, this.jpayload);
+        requestConstructor();
     }
 
 
-    public void responseMaker() {
+    public void requestConstructor(){
+        switch (this.method){
+            case ("POST"):
+                this.request = new Request.Builder().url(rootURL + this.mainurl).post(requestBody).build();
+                break;
+            case ("PUT"):
+                this.request = new Request.Builder().url(rootURL + this.mainurl).put(requestBody).build();
+                break;
+            case ("GET"):
+            default:
+                this.request = new Request.Builder().url(rootURL + this.mainurl).build();
+                break;
+        }
+        this.call = client.newCall(request);
+    }
+
+
+    public String executeResponse() {
         try {
-            this.request = new Request.Builder().url(rootURL + this.mainurl).build();
-            Call call = client.newCall(request);
-            Response response = call.execute();
+            this.response = call.execute();
             this.responseString = response.body().string();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-
-
-
-
-
-    public String doAction(){
-        if (this.method.equals("GET") && this.mainurl.equals("/ids")) {
-            return getIdList();
-        } else if (this.method.equals("POST") && this.mainurl.equals("/ids")){
-            return postID();
-        } else if (this.method.equals("PUT") && this.mainurl.equals("/ids")){
-            return putID();
-
-
-
-
-        } else {
+            //formatResponse();
             return responseString;
-        }
-    }
-
-
-    public String getIdList(){
-        String results;
-        IdController controller = IdController.getINSTANCE();
-        ArrayList<Id> ids = controller.getIds(this.responseString);
-        IdTextView idTextView = new IdTextView();
-        results = idTextView.printIds(ids);
-        return this.responseString;
-    }
-
-
-
-    public String postID() {
-        try {
-            this.requestBody = RequestBody.create(JSON, this.jpayload);
-            this.request = new Request.Builder().url(rootURL + this.mainurl).post(requestBody).build();
-            Response response = client.newCall(request).execute();
-            return response.body().string();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -87,17 +64,23 @@ public class TransactionController {
     }
 
 
-    public String putID() {
-        try {
-            this.requestBody = RequestBody.create(JSON, this.jpayload);
-            this.request = new Request.Builder().url(rootURL + this.mainurl).put(requestBody).build();
-            Response response = client.newCall(request).execute();
-            return response.body().string();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
+
+
+
+
+
+
+
+//    public void formatResponse(){
+//        switch (this.mainurl){
+//            case ("/ids"):
+//                this.responseString = IdTextView.getINSTANCE().printIds();
+//                break;
+//            default:
+//                break;
+//        }
+//    }
+
 
 
 

@@ -16,6 +16,7 @@ import com.sun.xml.internal.bind.v2.model.core.ID;
 import controllers.IdController;
 import controllers.MessageController;
 import models.Id;
+import models.Message;
 
 // Simple Shell is a Console view for views.YouAreEll.
 public class SimpleShell {
@@ -28,6 +29,12 @@ public class SimpleShell {
         mapper.enable(SerializationFeature.INDENT_OUTPUT);
         output = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(json);
         System.out.println(output);
+        //System.out.println(IdTextView.getINSTANCE().printIds());
+        //System.out.println(output);
+
+
+//        System.out.println("XXXXX");
+//        System.out.println(MessageController.getINSTANCE().getMessageList());
 
 //        IdTextView textView = new IdTextView();
 //        System.out.println(textView.printIds(IdController.getINSTANCE().getIdList()));
@@ -54,7 +61,29 @@ public class SimpleShell {
             commandLine = console.readLine();
 
             //input parsed into array of strings(command and arguments)
-            String[] commands = commandLine.split(" ");
+            String[] commands;
+            if (commandLine.contains("\'")) {
+                String[] split = commandLine.split("'");
+                String message = split[1];
+                String[] beforeSplit = split[0].split(" ");
+                String[] afterSplit;
+
+                if (split.length >= 3) {
+                    afterSplit = split[2].split(" ");
+                } else {
+                    afterSplit = new String[1];
+                }
+                commands = new String[beforeSplit.length + afterSplit.length];
+                System.arraycopy(beforeSplit, 0, commands, 0, beforeSplit.length);
+                System.arraycopy(afterSplit, 0, commands, beforeSplit.length, afterSplit.length);
+                commands[beforeSplit.length] = message;
+            } else {
+                commands = commandLine.split(" ");
+            }
+
+
+
+
             List<String> list = new ArrayList<String>();
 
             //if the user entered a return, just loop again
@@ -92,7 +121,7 @@ public class SimpleShell {
 
 
                 if (list.contains("ids") && list.size() == 3){
-                    webber.get_ids();
+                    IdController.getINSTANCE().updateIds();
                     Id id = IdController.getINSTANCE().listContains(list.get(2));
                     if (id == null){
                         Id newId = new Id(list.get(1), list.get(2));
@@ -112,12 +141,53 @@ public class SimpleShell {
 
 
                 // messages
-                if (list.contains("messages")) {
+                if (list.contains("messages") && list.size() == 1) {
                     String results = webber.get_messages();
                     SimpleShell.prettyPrint(results);
                     continue;
                 }
                 // you need to add a bunch more.
+
+                if (list.contains("messages") && list.size() == 2) {
+                    String mainUrl = "/ids/" + list.get(1) + "/messages";
+                    String results = webber.get_your_messages(mainUrl);
+                    SimpleShell.prettyPrint(results);
+                    continue;
+                }
+
+
+                if (list.contains("send") && list.size() == 3) {
+                    String message = list.get(2);
+                    String name = list.get(1);
+                    Message newMessage = new Message(message, name, "");
+                    String jsonMessage = mapper.writeValueAsString(newMessage);
+                    String mainUrl = "/ids/" + name + "/messages";
+                    String results = webber.post_message(mainUrl, jsonMessage);
+                    SimpleShell.prettyPrint(results);
+                    continue;
+                }
+
+
+                if (list.contains("send") && list.size() > 3) {
+                    String message = list.get(2);
+                    String name = list.get(1);
+                    String toid = list.get(4);
+                    Message newMessage = new Message(message, name, toid);
+                    String jsonMessage = mapper.writeValueAsString(newMessage);
+                    String mainUrl = "/ids/" + name + "/messages";
+                    String results = webber.post_message(mainUrl, jsonMessage);
+                    SimpleShell.prettyPrint(results);
+                    continue;
+                }
+
+
+
+
+
+
+
+
+
 
                 //!! command returns the last command in history
                 if (list.get(list.size() - 1).equals("!!")) {

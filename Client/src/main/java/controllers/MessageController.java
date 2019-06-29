@@ -12,9 +12,11 @@ import models.Message;
 
 public class MessageController {
 
-    private List<Message> messageList;
-    private HashSet<Message> messagesSeen;     // why a HashSet??
 
+    private ArrayList<Message> messageList;
+    private HashSet<Message> messagesSeen;     // why a HashSet??
+    private TransactionController transactionController;
+    private ObjectMapper mapper = new ObjectMapper();
 
     private static final MessageController INSTANCE = new MessageController();
 
@@ -23,17 +25,17 @@ public class MessageController {
 
 
 
-    public ArrayList<Message> getMessages(String jsonString) {
-        ObjectMapper mapper = new ObjectMapper();
+    public void updateMessages() {
+        transactionController = new TransactionController("/messages", "GET", "");
+        String jsonString = transactionController.executeResponse();
         TypeFactory typeFactory = mapper.getTypeFactory();
         ArrayList<Message> list = new ArrayList<>();
         try {
-            list = mapper.readValue(jsonString, typeFactory.constructCollectionType(ArrayList.class, Id.class));
+            list = mapper.readValue(jsonString, typeFactory.constructCollectionType(ArrayList.class, Message.class));
         } catch (IOException e){
             e.printStackTrace();
         }
         this.messageList = list;
-        return list;
     }
 
 
@@ -55,6 +57,12 @@ public class MessageController {
     }
 
 
+
+
+    public List<Message> getMessageList() {
+        updateMessages();
+        return messageList;
+    }
 
     public static MessageController getINSTANCE() {
         return INSTANCE;

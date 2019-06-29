@@ -15,21 +15,21 @@ public class IdController {
     Id myId;
     List<Id> ids = new ArrayList<>();
     private ObjectMapper mapper = new ObjectMapper();
-
-
     private static final IdController INSTANCE = new IdController();
-
+    private TransactionController transactionController;
 
     private IdController(){}
 
 
     public ArrayList<Id> getIdList(){
+        updateIds();
         return (ArrayList<Id>) ids;
     }
 
 
-
-    public ArrayList<Id> getIds(String jsonString) {
+    public void updateIds(){
+        transactionController = new TransactionController("/ids", "GET", "");
+        String jsonString = transactionController.executeResponse();
         TypeFactory typeFactory = mapper.getTypeFactory();
         ArrayList<Id> list = new ArrayList<>();
         try {
@@ -38,11 +38,12 @@ public class IdController {
             e.printStackTrace();
         }
         this.ids = list;
-        return list;
     }
 
 
+
     public Id listContains(String gitHub){
+        updateIds();
         for (Id id : ids){
             if (id.getGithub().equals(gitHub)){
                 return id;

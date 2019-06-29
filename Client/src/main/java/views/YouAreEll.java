@@ -46,9 +46,22 @@ public class YouAreEll {
         return MakeURLCall("/messages", "GET", "");
     }
 
+    public String get_your_messages(String mainurl) {
+        return MakeURLCall(mainurl, "GET", "");
+    }
+
+
+
+    public String post_message(String mainUrl, String jpayload) {
+        return MakeURLCall(mainUrl, "POST", jpayload);
+    }
+
+
+
+
     public String MakeURLCall(String mainurl, String method, String jpayload) {
         this.transactionController = new TransactionController(mainurl, method, jpayload);
-        return transactionController.doAction();
+        return transactionController.executeResponse();
         //return "nada";
     }
 }
