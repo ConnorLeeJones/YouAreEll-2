@@ -74,7 +74,7 @@ public class TransactionController {
 //    public void formatResponse(){
 //        switch (this.mainurl){
 //            case ("/ids"):
-//                this.responseString = IdTextView.getINSTANCE().printIds();
+//                this.responseString = IdTextView.getINSTANCE().printMessages();
 //                break;
 //            default:
 //                break;

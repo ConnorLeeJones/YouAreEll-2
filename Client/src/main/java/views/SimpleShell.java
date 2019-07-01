@@ -6,13 +6,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Predicate;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.sun.xml.internal.bind.v2.model.core.ID;
 import controllers.IdController;
 import controllers.MessageController;
 import models.Id;
@@ -20,7 +16,7 @@ import models.Message;
 
 // Simple Shell is a Console view for views.YouAreEll.
 public class SimpleShell {
-
+    private Id thisId;
 
 
     public static void prettyPrint(String output) throws IOException {
@@ -29,15 +25,7 @@ public class SimpleShell {
         mapper.enable(SerializationFeature.INDENT_OUTPUT);
         output = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(json);
         System.out.println(output);
-        //System.out.println(IdTextView.getINSTANCE().printIds());
-        //System.out.println(output);
-
-
-//        System.out.println("XXXXX");
-//        System.out.println(MessageController.getINSTANCE().getMessageList());
-
-//        IdTextView textView = new IdTextView();
-//        System.out.println(textView.printIds(IdController.getINSTANCE().getIdList()));
+//        System.out.println(MessageTextView.getINSTANCE().printMessages());
     }
 
 
@@ -56,6 +44,9 @@ public class SimpleShell {
         int index = 0;
         //we break out with <ctrl c>
         while (true) {
+
+
+
             //read what the user enters
             System.out.println("cmd? ");
             commandLine = console.readLine();

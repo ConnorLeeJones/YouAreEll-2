@@ -51,7 +51,6 @@ public class MessageController {
     public ArrayList<Message> getMessagesFromFriend(Id myId, Id friendId) {
         return null;
     }
-
     public Message postMessage(Id myId, Id toId, Message msg) {
         return null;
     }
@@ -59,7 +58,7 @@ public class MessageController {
 
 
 
-    public List<Message> getMessageList() {
+    public ArrayList<Message> getMessageList() {
         updateMessages();
         return messageList;
     }

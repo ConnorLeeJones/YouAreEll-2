@@ -1,10 +1,12 @@
 package models;
 
-/* 
+import java.sql.Timestamp;
+
+/*
  * POJO for an Message object
  */
 public class Message {
-    private String timestamp;
+    private Timestamp timestamp;
     private String sequence;
     private String message;
     private String fromid;
@@ -53,11 +55,11 @@ public class Message {
         this.toid = toid;
     }
 
-    public String getTimestamp() {
+    public Timestamp getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(String timestamp) {
+    public void setTimestamp(Timestamp timestamp) {
         this.timestamp = timestamp;
     }
 
